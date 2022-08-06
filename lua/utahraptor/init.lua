@@ -1,17 +1,20 @@
 local fn = vim.fn
 local api = vim.api
 
-local match_pattern_id = nil
-local match_cursor_id = nil
+local call_count = 0
 
-local function sleep(ms)
-  vim.wait(ms, function() return fn.getchar(1) ~= 0 end)
-  -- local t = fn.reltime()
-  -- while (fn.getchar(1) == 0) and ((ms - fn.reltimestr(fn.reltime(t)) * 1000.0) > 0) do
-  -- end
+local function matchdelete(match_id)
+  if match_id ~= nil then
+    fn.matchdelete(match_id)
+  end
 end
 
-local function l_flash()
+M = {}
+
+local function l_flash(wait_ms)
+  call_count = call_count + 1
+  local current_call_count = call_count
+
   local pattern = fn.getreg('/')
   local last_en_chars = fn.matchstr(pattern, [[\\\+$]])
 
@@ -31,36 +34,33 @@ local function l_flash()
     end_cars = [[\\)]]
   end
 
-  api.nvim_echo({{[[\%#\(]] .. pattern .. end_cars}}, true, {})
-  match_pattern_id = fn.matchadd('CursorIM', [[\%#\(]] .. pattern .. end_cars, 100)
-  match_cursor_id = fn.matchadd('Cursor', [[\\%#]], 101)
+  local l, c = unpack(vim.list_slice(fn.getpos('.'), 2, 3))
+  local l_pattern = [[\%]] .. l .. [[l]]
+  local c_pattern = [[\%]] .. c .. [[c]]
+
+  local match_pattern_id = fn.matchadd('CursorIM', l_pattern .. c_pattern .. [[\(]] .. pattern .. end_cars, 100)
+  local match_cursor_id = fn.matchadd('Cursor', l_pattern .. c_pattern, 101)
 
   vim.cmd('redraw')
-  sleep(1000)
+
+  local timer = vim.loop.new_timer()
+  local i = 1
+  timer:start(1, 25, vim.schedule_wrap(function()
+    local ll, cc = unpack(vim.list_slice(fn.getpos('.'), 2, 3))
+    if i * 20  > wait_ms or (ll ~= l or cc ~= c)then
+      matchdelete(match_pattern_id)
+      matchdelete(match_cursor_id)
+      timer:close()  -- Always close handles to avoid leaks.
+    end
+    i = i + 1
+  end))
 end
 
-M = {}
-
 M.flash = function()
-  if match_cursor_id ~= nil or match_cursor_id ~= nil then
-    api.nvim_echo({'utahraptor.nvim: Double called', 'ErrorMsg'}, true, {})
-    return
-  end
-
-  local ok, result = pcall(l_flash)
-
-  if match_pattern_id ~= nil then
-    fn.matchdelete(match_pattern_id)
-    match_pattern_id = nil
-  end
-
-  if match_cursor_id ~= nil then
-    fn.matchdelete(match_cursor_id)
-    match_cursor_id = nil
-  end
+  local ok, result = pcall(l_flash, 1000)
 
   if ok == false then
-    api.nvim_echo({{result, 'ErrorMsg'}}, true, {})
+    api.nvim_echo({{'utahraptor.nvim: ', 'ErrorMsg'}, {result, 'ErrorMsg'}}, true, {})
   end
 end
 
