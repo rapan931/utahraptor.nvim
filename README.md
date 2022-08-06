@@ -1,2 +1,2 @@
 # utahraptor.nvim
-flush
+flash
