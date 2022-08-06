@@ -28,9 +28,6 @@ local function l_flash(wait_ms)
   local search_pattern = l_pattern .. c_pattern .. [[\(]] .. pattern .. end_cars
 
   local match_pattern_id = fn.matchadd('ErrorMsg', search_pattern, 100, -1, { window = win_id })
-  local match_cursor_id = fn.matchadd('Cursor', l_pattern .. c_pattern, 101, -1, { window = win_id })
-
-  -- vim.cmd('redraw')
 
   local timer = vim.loop.new_timer()
   local i = 1
@@ -43,7 +40,6 @@ local function l_flash(wait_ms)
         stopped = true
         timer:close()
         fn.matchdelete(match_pattern_id, win_id)
-        fn.matchdelete(match_cursor_id, win_id)
       end
     end
     i = i + 1
