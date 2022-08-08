@@ -1,7 +1,20 @@
 local fn = vim.fn
 local api = vim.api
 
-local function l_flash(wait_ms)
+-- Add 'Utahraptor' hightlight group
+api.nvim_set_hl(0, 'Utahraptor', { bg = 'Purple', fg = 'White' })
+
+---@class utahraptorConfig
+---@field flash_ms number flash time(ms)
+---@field flash_hl_group string flash hightlignt group
+local config = {
+  flash_ms = 500,
+  flash_hl_group = 'Utahraptor'
+}
+
+---@param flash_ms number
+---@param flash_hl_group string
+local function l_flash(flash_ms, flash_hl_group)
   local win_id = fn.win_getid()
   local pattern = fn.getreg('/')
   local last_backslash_chars = fn.matchstr(pattern, [[\\\+$]])
@@ -13,12 +26,12 @@ local function l_flash(wait_ms)
     -- /\<CR>
     end_cars = [[\\)]]
   elseif #last_backslash_chars % 2 == 0 then
-    -- /hogehoge\\<CR>
-    -- /hogehoge\\\\<CR>
+    -- /hoge\\<CR>
+    -- /hoge\\\\<CR>
     end_cars = [[\)]]
   else
-    -- /hogehoge\<CR>
-    -- /hogehoge\\\<CR>
+    -- /hoge\<CR>
+    -- /hoge\\\<CR>
     end_cars = [[\\)]]
   end
 
@@ -27,7 +40,7 @@ local function l_flash(wait_ms)
   local c_pattern = [[\%]] .. c .. [[c]]
   local search_pattern = l_pattern .. c_pattern .. [[\(]] .. pattern .. end_cars
 
-  local match_pattern_id = fn.matchadd('ErrorMsg', search_pattern, 100, -1, { window = win_id })
+  local match_pattern_id = fn.matchadd(flash_hl_group, search_pattern, 100, -1, { window = win_id })
 
   local timer = vim.loop.new_timer()
   local i = 1
@@ -35,7 +48,7 @@ local function l_flash(wait_ms)
   local interval = 42
   timer:start(1, interval, vim.schedule_wrap(function()
     local ll, cc = unpack(vim.list_slice(fn.getpos('.'), 2, 3))
-    if i * interval  > wait_ms or (ll ~= l or cc ~= c) or fn.win_getid() ~= win_id then
+    if i * interval  > flash_ms or (ll ~= l or cc ~= c) or fn.win_getid() ~= win_id then
       if not stopped then
         stopped = true
         timer:close()
@@ -46,13 +59,38 @@ local function l_flash(wait_ms)
   end))
 end
 
+---@param command string command
+local function do_command_and_flash(command)
+  local ok, result = pcall(vim.cmd, command)
+
+  if ok == false then
+    api.nvim_echo({{'utahraptor.nvim: ', 'ErrorMsg'}, {result, 'ErrorMsg'}}, true, {})
+    return
+  end
+  M.flash()
+end
+
 M = {}
+
+---@param override utahraptorConfig
+M.setup = function(override)
+  config = vim.tbl_extend('force', config, override)
+end
+
 M.flash = function()
-  local ok, result = pcall(l_flash, 1000)
+  local ok, result = pcall(l_flash, config.flash_ms, config.flash_hl_group)
 
   if ok == false then
     api.nvim_echo({{'utahraptor.nvim: ', 'ErrorMsg'}, {result, 'ErrorMsg'}}, true, {})
   end
+end
+
+M.n_flash = function()
+  do_command_and_flash([[normal! n]])
+end
+
+M.N_flash = function()
+  do_command_and_flash([[normal! n]])
 end
 
 return M
