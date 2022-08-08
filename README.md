@@ -22,11 +22,11 @@ vim.keymap.set({'n', 'x', 'o'}, 'N', function() require('utahraptor').N_flash() 
 use [bistahieversor.nvim](https://github.com/rapan931/bistahieversor.nvim) & [lasterisk.nvim](https://github.com/rapan931/lasterisk.nvim)
 
 ```lua
-vim.keymap.set('n', 'n', function()
+vim.keymap.set({'n', 'x', 'o'}, 'n', function()
   require('bistahieversor').n_and_echo()
   require('utahraptor').flash()
 end)
-vim.keymap.set('n', 'N', function()
+vim.keymap.set({'n', 'x', 'o'}, 'N', function()
   require('bistahieversor').N_and_echo()
   require('utahraptor').flash()
 end)
