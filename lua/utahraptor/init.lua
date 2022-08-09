@@ -38,7 +38,7 @@ local function l_flash(flash_ms, flash_hl_group)
   local l, c = unpack(vim.list_slice(fn.getpos('.'), 2, 3))
   local l_pattern = [[\%]] .. l .. [[l]]
   local c_pattern = [[\%]] .. c .. [[c]]
-  local search_pattern = l_pattern .. c_pattern .. [[\(]] .. pattern .. end_cars
+  local search_pattern = [[\c]] .. l_pattern .. c_pattern .. [[\(]] .. pattern .. end_cars
 
   local match_pattern_id = fn.matchadd(flash_hl_group, search_pattern, 100, -1, { window = win_id })
 
