@@ -90,7 +90,7 @@ M.n_flash = function()
 end
 
 M.N_flash = function()
-  do_command_and_flash([[normal! n]])
+  do_command_and_flash([[normal! N]])
 end
 
 return M
