@@ -38,8 +38,7 @@ vim.keymap.set('n', '*',  function()
 end)
 ```
 
-![Animation3](https://user-images.githubusercontent.com/24415677/183463254-99617514-5433-4a89-b442-53e41bff8ebb.gif)
-
+![Animation4](https://user-images.githubusercontent.com/24415677/184920909-2127e825-f480-4adb-a53c-9b42448396ef.gif)
 
 ## Options
 
