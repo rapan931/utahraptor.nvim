@@ -5,9 +5,7 @@ local api = vim.api
 local augroup = api.nvim_create_augroup("Utahraptor", {})
 api.nvim_create_autocmd("ColorScheme", {
   group = augroup,
-  callback = function()
-    api.nvim_set_hl(0, 'Utahraptor', { bg = 'Purple', fg = 'White' })
-  end,
+  callback = function() api.nvim_set_hl(0, 'Utahraptor', { bg = 'Purple', fg = 'White' }) end,
   desc = "Set Utahraptor highlight group",
 })
 api.nvim_set_hl(0, 'Utahraptor', { bg = 'Purple', fg = 'White' })
@@ -56,7 +54,7 @@ local function l_flash(flash_ms, flash_hl_group)
   local interval = 42
   timer:start(1, interval, vim.schedule_wrap(function()
     local ll, cc = unpack(vim.list_slice(fn.getpos('.'), 2, 3))
-    if i * interval  > flash_ms or (ll ~= l or cc ~= c) or fn.win_getid() ~= win_id then
+    if i * interval > flash_ms or (ll ~= l or cc ~= c) or fn.win_getid() ~= win_id then
       if not stopped then
         stopped = true
         timer:close()
@@ -72,7 +70,7 @@ local function do_command_and_flash(command)
   local ok, result = pcall(vim.cmd, command)
 
   if ok == false then
-    api.nvim_echo({{'utahraptor.nvim: ', 'ErrorMsg'}, {result, 'ErrorMsg'}}, true, {})
+    api.nvim_echo({ { 'utahraptor.nvim: ', 'ErrorMsg' }, { result, 'ErrorMsg' } }, true, {})
     return
   end
   M.flash()
@@ -89,7 +87,7 @@ M.flash = function()
   local ok, result = pcall(l_flash, config.flash_ms, config.flash_hl_group)
 
   if ok == false then
-    api.nvim_echo({{'utahraptor.nvim: ', 'ErrorMsg'}, {result, 'ErrorMsg'}}, true, {})
+    api.nvim_echo({ { 'utahraptor.nvim: ', 'ErrorMsg' }, { result, 'ErrorMsg' } }, true, {})
   end
 end
 
