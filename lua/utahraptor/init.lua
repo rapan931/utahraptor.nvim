@@ -2,6 +2,14 @@ local fn = vim.fn
 local api = vim.api
 
 -- Add 'Utahraptor' hightlight group
+local augroup = api.nvim_create_augroup("Utahraptor", {})
+api.nvim_create_autocmd("ColorScheme", {
+  group = augroup,
+  callback = function()
+    api.nvim_set_hl(0, 'Utahraptor', { bg = 'Purple', fg = 'White' })
+  end,
+  desc = "Set Utahraptor highlight group",
+})
 api.nvim_set_hl(0, 'Utahraptor', { bg = 'Purple', fg = 'White' })
 
 ---@class utahraptorConfig
