@@ -58,7 +58,9 @@ local function l_flash(flash_ms, flash_hl_group)
       if not stopped then
         stopped = true
         timer:close()
-        fn.matchdelete(match_pattern_id, win_id)
+        if #fn.getwininfo(win_id) ~= 0 then
+          fn.matchdelete(match_pattern_id, win_id)
+        end
       end
     end
     i = i + 1
