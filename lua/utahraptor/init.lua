@@ -5,9 +5,7 @@ local api = vim.api
 local augroup = api.nvim_create_augroup("Utahraptor", {})
 api.nvim_create_autocmd("ColorScheme", {
   group = augroup,
-  callback = function()
-    api.nvim_set_hl(0, "Utahraptor", { bg = "Purple", fg = "White" })
-  end,
+  callback = function() api.nvim_set_hl(0, "Utahraptor", { bg = "Purple", fg = "White" }) end,
   desc = "Set Utahraptor highlight group",
 })
 api.nvim_set_hl(0, "Utahraptor", { bg = "Purple", fg = "White" })
@@ -87,9 +85,7 @@ end
 M = {}
 
 ---@param override utahraptorConfig
-M.setup = function(override)
-  config = vim.tbl_extend("force", config, override)
-end
+M.setup = function(override) config = vim.tbl_extend("force", config, override) end
 
 M.flash = function()
   local ok, result = pcall(l_flash, config.flash_ms, config.flash_hl_group)
@@ -99,12 +95,8 @@ M.flash = function()
   end
 end
 
-M.n_flash = function()
-  do_command_and_flash([[normal! n]])
-end
+M.n_flash = function() do_command_and_flash([[normal! n]]) end
 
-M.N_flash = function()
-  do_command_and_flash([[normal! N]])
-end
+M.N_flash = function() do_command_and_flash([[normal! N]]) end
 
 return M
