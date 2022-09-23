@@ -5,24 +5,26 @@ local api = vim.api
 local augroup = api.nvim_create_augroup("Utahraptor", {})
 api.nvim_create_autocmd("ColorScheme", {
   group = augroup,
-  callback = function() api.nvim_set_hl(0, 'Utahraptor', { bg = 'Purple', fg = 'White' }) end,
+  callback = function()
+    api.nvim_set_hl(0, "Utahraptor", { bg = "Purple", fg = "White" })
+  end,
   desc = "Set Utahraptor highlight group",
 })
-api.nvim_set_hl(0, 'Utahraptor', { bg = 'Purple', fg = 'White' })
+api.nvim_set_hl(0, "Utahraptor", { bg = "Purple", fg = "White" })
 
 ---@class utahraptorConfig
 ---@field flash_ms number flash time(ms)
 ---@field flash_hl_group string flash hightlignt group
 local config = {
   flash_ms = 500,
-  flash_hl_group = 'Utahraptor'
+  flash_hl_group = "Utahraptor",
 }
 
 ---@param flash_ms number
 ---@param flash_hl_group string
 local function l_flash(flash_ms, flash_hl_group)
   local win_id = fn.win_getid()
-  local pattern = fn.getreg('/')
+  local pattern = fn.getreg("/")
   local last_backslash_chars = fn.matchstr(pattern, [[\\\+$]])
 
   local end_cars
@@ -41,7 +43,7 @@ local function l_flash(flash_ms, flash_hl_group)
     end_cars = [[\\)]]
   end
 
-  local l, c = unpack(vim.list_slice(fn.getpos('.'), 2, 3))
+  local l, c = unpack(vim.list_slice(fn.getpos("."), 2, 3))
   local l_pattern = [[\%]] .. l .. [[l]]
   local c_pattern = [[\%]] .. c .. [[c]]
   local search_pattern = [[\c]] .. l_pattern .. c_pattern .. [[\(]] .. pattern .. end_cars
@@ -52,19 +54,23 @@ local function l_flash(flash_ms, flash_hl_group)
   local i = 1
   local stopped = false
   local interval = 42
-  timer:start(1, interval, vim.schedule_wrap(function()
-    local ll, cc = unpack(vim.list_slice(fn.getpos('.'), 2, 3))
-    if i * interval > flash_ms or (ll ~= l or cc ~= c) or fn.win_getid() ~= win_id then
-      if not stopped then
-        stopped = true
-        timer:close()
-        if #fn.getwininfo(win_id) ~= 0 then
-          fn.matchdelete(match_pattern_id, win_id)
+  timer:start(
+    1,
+    interval,
+    vim.schedule_wrap(function()
+      local ll, cc = unpack(vim.list_slice(fn.getpos("."), 2, 3))
+      if i * interval > flash_ms or (ll ~= l or cc ~= c) or fn.win_getid() ~= win_id then
+        if not stopped then
+          stopped = true
+          timer:close()
+          if #fn.getwininfo(win_id) ~= 0 then
+            fn.matchdelete(match_pattern_id, win_id)
+          end
         end
       end
-    end
-    i = i + 1
-  end))
+      i = i + 1
+    end)
+  )
 end
 
 ---@param command string command
@@ -72,7 +78,7 @@ local function do_command_and_flash(command)
   local ok, result = pcall(vim.cmd, command)
 
   if ok == false then
-    api.nvim_echo({ { 'utahraptor.nvim: ', 'ErrorMsg' }, { result, 'ErrorMsg' } }, true, {})
+    api.nvim_echo({ { "utahraptor.nvim: ", "ErrorMsg" }, { result, "ErrorMsg" } }, true, {})
     return
   end
   M.flash()
@@ -82,14 +88,14 @@ M = {}
 
 ---@param override utahraptorConfig
 M.setup = function(override)
-  config = vim.tbl_extend('force', config, override)
+  config = vim.tbl_extend("force", config, override)
 end
 
 M.flash = function()
   local ok, result = pcall(l_flash, config.flash_ms, config.flash_hl_group)
 
   if ok == false then
-    api.nvim_echo({ { 'utahraptor.nvim: ', 'ErrorMsg' }, { result, 'ErrorMsg' } }, true, {})
+    api.nvim_echo({ { "utahraptor.nvim: ", "ErrorMsg" }, { result, "ErrorMsg" } }, true, {})
   end
 end
 
